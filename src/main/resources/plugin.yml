@@ -1,0 +1,29 @@
+name: "PhantomControl"
+version: "1.0.0-alpha.1"
+description: "A plugin which allows controlling phantoms, global and per-player."
+authors: ["ibu2awesome"]
+main: "info.mythicmc.phantomcontrol.PhantomControl"
+api-version: "1.13"
+
+# Setting up commands here.
+commands:
+  phantom:
+    description: "Command which allows toggling phantoms."
+    usage: "/phantom (on/off) (global/username, requires an on/off argument)"
+    permission: PhantomControl.playertoggle
+
+
+# Setting up permissions here.
+permissions:
+  PhantomControl.*:
+    description: "Maximum permissions for controlling phantoms."
+    default: op
+    children:
+      - PhantomControl.globaltoggle
+      - PhantomControl.playertoggle
+  PhantomControl.globaltoggle:
+    description: "Toggle phantoms globally or for other players without limiting."
+    default: op
+  PhantomControl.playertoggle:
+    description: "Toggle phantoms for your own player."
+    default: true
