@@ -7,6 +7,10 @@ api-version: "1.13"
 
 # Setting up commands here.
 commands:
+  phantomreload:
+    description: "Reload PhantomControl config and storage."
+    usage: "/phantomreload"
+    permission: PhantomControl.globaltoggle
   phantom:
     description: "Command which allows toggling phantoms."
     usage: "/phantom (on/off) (global/username, requires an on/off argument)"

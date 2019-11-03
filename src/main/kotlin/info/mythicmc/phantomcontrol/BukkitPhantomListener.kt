@@ -2,18 +2,19 @@ package info.mythicmc.phantomcontrol
 
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Phantom
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent
-import org.bukkit.event.entity.EntityDamageByEntityEvent
 
-class PhantomListener(private val plugin: PhantomControl) : Listener {
+class BukkitPhantomListener(private val plugin: PhantomControl) : Listener {
     @EventHandler
     fun onCreatureSpawnEvent(e: CreatureSpawnEvent) {
-        if (e.entityType != EntityType.PHANTOM) return
+        // If the entity isn't a phantom with a player target, we don't care.
+        if (e.entityType != EntityType.PHANTOM || (e as Phantom).target !is Player) return
         // Check if phantoms are globally disabled and disabled for the player.
-        // val player = (e as Phantom).target
-        if (!plugin.getGlobalSetting() && !plugin.getPlayerSetting()) {
+        val player = (e as Phantom).target as Player // TODO: Confirm whether this works or not.
+        if (!plugin.isEnabledForPlayer(player.name)) {
             e.isCancelled = true
         }
     }
