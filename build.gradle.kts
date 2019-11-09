@@ -15,11 +15,13 @@ repositories {
     jcenter()
     maven (url = "https://oss.sonatype.org/content/repositories/snapshots")
     maven (url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    maven (url = "https://papermc.io/repo/repository/maven-public/")
 }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT")
+    // compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT")
+    compileOnly("com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT")
 }
 
 configure<JavaPluginConvention> {

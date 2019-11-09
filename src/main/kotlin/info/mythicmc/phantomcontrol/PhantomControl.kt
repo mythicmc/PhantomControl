@@ -13,10 +13,9 @@ class PhantomControl : JavaPlugin() {
         /*
         TODO:
         - Complete PhantomCommand.
-        - Complete PhantomListener.
+        - Test PhantomListener.
         - Complete BukkitPhantomListener.
         - Allow disabling per-player spawning.
-        - Create YamlConfiguration storage system.
         - Add /phantomtoggle or /phantom toggle.
         - Add tab autocomplete.
         */
@@ -33,6 +32,21 @@ class PhantomControl : JavaPlugin() {
             return@setExecutor true
         }
         getCommand("phantom")?.setExecutor(PhantomCommand(this))
+
+        // If server is Paper, initialize PhantomListener, else BukkitPhantomListener.
+        if (server.name == "Paper") {
+            logger.info("Detected Paper, registering Paper-specific listener.")
+            server.pluginManager.registerEvents(PhantomListener(this), this)
+        } else {
+            logger.info("Did not detect Paper, falling back to untested Bukkit listener.")
+            logger.info("====================== GET PAPER ======================")
+            logger.info("PhantomControl uses the Paper API for more accurate data")
+            logger.info("about phantom spawning. Paper also provides much more")
+            logger.info("performance and works with existing Spigot and Bukkit")
+            logger.info("plugins. See: https://papermc.io for more info")
+            logger.info("=======================================================")
+            server.pluginManager.registerEvents(BukkitPhantomListener(this), this)
+        }
     }
 
     fun isGloballyEnabled(): Boolean {
@@ -48,7 +62,7 @@ class PhantomControl : JavaPlugin() {
         storage.save(File(dataFolder, "storage.yml"))
     }
 
-    fun reloadStorage() {
+    private fun reloadStorage() {
         storage = YamlConfiguration.loadConfiguration(File(dataFolder, "storage.yml"))
     }
 

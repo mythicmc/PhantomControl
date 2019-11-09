@@ -22,8 +22,18 @@ class BukkitPhantomListener(private val plugin: PhantomControl) : Listener {
     /*
     @EventHandler
     fun onEntityDamageByEntityEvent(e: EntityDamageByEntityEvent) {
-        // TODO: Check for phantom damaging player who spawned it with disabled phantoms and vice-versa.
-        // TODO: Check for phantom damaging player with disabled phantoms and did not spawn phantom.
+        / Check for phantom damaging player who spawned it with disabled phantoms and vice-versa.
+        // If either, despawn the phantom.
+        // Also, check for phantom damaging player with disabled phantoms and did not spawn phantom.
+        if (e.damager.type == EntityType.PHANTOM && e.entityType == EntityType.PLAYER && !plugin.isEnabledForPlayer(e.entity.name)) {
+            e.isCancelled = true
+            if ((e.damager as Phantom).spawningEntity == e.entity.uniqueId) e.damager.remove() // TODO: Eliminate Paper.
+        } else if (e.damager.type == EntityType.PLAYER && e.entityType == EntityType.PHANTOM && !plugin.isEnabledForPlayer(e.damager.name)) {
+            if ((e.entity as Phantom).spawningEntity == e.damager.uniqueId) { // TODO: Eliminate Paper.
+                e.isCancelled = true
+                e.entity.remove()
+            }
+        }
     }
     */
 }

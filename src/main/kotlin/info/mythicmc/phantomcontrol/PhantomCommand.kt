@@ -4,24 +4,18 @@ import org.bukkit.ChatColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 class PhantomCommand(private val plugin: PhantomControl) : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         when {
-            args[0] == "on" && args.size == 1 -> {
-                // If enabled, we tell them phantoms are already enabled.
-                if (plugin.isEnabledForPlayer(sender.name))
-                    sender.sendMessage("${ChatColor.RED}You already have phantoms enabled!")
-                else {
-                    // We exempt the player.
-                    val list = plugin.storage.getStringList("exemptedPlayers")
-                    if (plugin.isGloballyEnabled()) list.remove(sender.name) else list.add(sender.name)
-                    plugin.storage.set("exemptedPlayers", list)
-                    plugin.saveStorage()
-                    sender.sendMessage("${ChatColor.GREEN}Phantoms have been enabled for you!")
-                }
+            args.isEmpty() -> {
+                sender.sendMessage("${ChatColor.AQUA}Phantoms are currently: ${
+                if (plugin.isEnabledForPlayer(sender.name)) "${ChatColor.GREEN}enabled" else "${ChatColor.RED}disabled"
+                } ${ChatColor.AQUA}for you.")
                 return true
             }
+            /*
             (args[0] == "on" || args[0] == "off") && args.size == 2 && args[1] == "global" -> {
                 // Check for permissions first.
                 if (!sender.hasPermission("PhantomControl.globaltoggle"))
@@ -42,11 +36,36 @@ class PhantomCommand(private val plugin: PhantomControl) : CommandExecutor {
                 }
                 return true
             }
+            */
+            (args[0] == "on" || args[0] == "off") && args.size == 2 && args[1] == "global" -> {
+                sender.sendMessage("${ChatColor.RED}Currently, enabling phantoms globally is not allowed.")
+                return true
+            }
+            args[0] == "on" && args.size == 1 -> {
+                // If enabled, we tell them phantoms are already enabled.
+                when {
+                    sender !is Player -> sender.sendMessage("${ChatColor.RED}This command cannot be executed from console!")
+                    plugin.isEnabledForPlayer(sender.name) -> sender.sendMessage("${ChatColor.RED}You already have phantoms enabled!")
+                    else -> {
+                        // We exempt the player.
+                        val list = plugin.storage.getStringList("exemptedPlayers")
+                        if (plugin.isGloballyEnabled()) list.remove(sender.name) else list.add(sender.name)
+                        plugin.storage.set("exemptedPlayers", list)
+                        plugin.saveStorage()
+                        sender.sendMessage("${ChatColor.GREEN}Phantoms have been enabled for you!")
+                    }
+                }
+                return true
+            }
             args[0] == "on" && args.size == 2 -> {
                 // TODO: Check if player exists.
                 // If enabled, we tell them phantoms are already enabled.
-                if (plugin.isEnabledForPlayer(args[1]))
+                if (!sender.hasPermission("phantomcontrol.globaltoggle"))
+                    sender.sendMessage("${ChatColor.RED}You do not have permission for this!")
+                else if (plugin.isEnabledForPlayer(args[1]))
                     sender.sendMessage("${ChatColor.RED}They already have phantoms enabled!")
+                // else if (plugin.server.getPlayerExact(args[1]) == null)
+                    // sender.sendMessage("${ChatColor.RED}This player does not exist!")
                 else {
                     // We exempt the player.
                     val list = plugin.storage.getStringList("exemptedPlayers")
@@ -59,32 +78,38 @@ class PhantomCommand(private val plugin: PhantomControl) : CommandExecutor {
             }
             args[0] == "off" && args.size == 1 -> {
                 // If disabled, we tell them phantoms are already disabled.
-                if (!plugin.isEnabledForPlayer(sender.name))
+                if (sender !is Player)
+                    sender.sendMessage("${ChatColor.RED}This command cannot be executed from console!")
+                else if (!plugin.isEnabledForPlayer(sender.name))
                     sender.sendMessage("${ChatColor.RED}You already have phantoms disabled!")
+                else if ((!sender.world.isDayTime || sender.world.isThundering) && !sender.hasPermission("phantomcontrol.globaltoggle"))
+                    sender.sendMessage("${ChatColor.RED}Phantoms may not be toggled at night or during thunderstorms!")
                 else {
                     // We remove the player's exemption.
                     val list = plugin.storage.getStringList("exemptedPlayers")
-                    if (plugin.isGloballyEnabled()) list.add(sender.name)
-                    else list.remove(sender.name)
+                    if (plugin.isGloballyEnabled()) list.add(sender.name) else list.remove(sender.name)
                     plugin.storage.set("exemptedPlayers", list)
                     plugin.saveStorage()
-                    sender.sendMessage("${ChatColor.GREEN}Phantoms have been enabled for you!")
+                    sender.sendMessage("${ChatColor.GREEN}Phantoms have been disabled for you!")
                 }
                 return true
             }
             args[0] == "off" && args.size == 2 -> {
                 // TODO: Check if player exists.
                 // If disabled, we tell them phantoms are already disabled.
-                if (!plugin.isEnabledForPlayer(args[1]))
+                if (!sender.hasPermission("phantomcontrol.globaltoggle"))
+                    sender.sendMessage("${ChatColor.RED}You do not have permission for this!")
+                else if (!plugin.isEnabledForPlayer(args[1]))
                     sender.sendMessage("${ChatColor.RED}They already have phantoms disabled!")
+                // else if (plugin.server.getPlayerExact(args[1]) == null)
+                    // sender.sendMessage("${ChatColor.RED}This player does not exist!")
                 else {
                     // We remove the player's exemption.
                     val list = plugin.storage.getStringList("exemptedPlayers")
-                    if (plugin.isGloballyEnabled()) list.add(args[1])
-                    else list.remove(args[1])
+                    if (plugin.isGloballyEnabled()) list.add(args[1]) else list.remove(args[1])
                     plugin.storage.set("exemptedPlayers", list)
                     plugin.saveStorage()
-                    sender.sendMessage("${ChatColor.GREEN}Phantoms have been enabled for them!")
+                    sender.sendMessage("${ChatColor.GREEN}Phantoms have been disabled for them!")
                 }
                 return true
             }
