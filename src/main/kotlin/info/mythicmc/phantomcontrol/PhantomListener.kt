@@ -52,5 +52,18 @@ class PhantomListener(private val plugin: PhantomControl) : Listener {
             e.isCancelled = true
             e.entity.remove()
         }
+        // For beds.
+        if (
+                e.damager.type == EntityType.PHANTOM &&
+                e.damager.entitySpawnReason == naturalSpawnReason &&
+                e.entityType == EntityType.PLAYER &&
+                plugin.isEnabledForPlayer(e.entity.name) &&
+                (e.entity as Player).isSleeping
+        ) {
+            // Cancel damage if player has phantoms enabled and has been attacked in bed.
+            e.isCancelled = true
+            // Additionally, if the player spawned this phantom, it must be de-spawned.
+            if ((e.damager as Phantom).spawningEntity == e.entity.uniqueId) e.damager.remove()
+        }
     }
 }
