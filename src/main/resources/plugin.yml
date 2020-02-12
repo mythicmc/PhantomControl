@@ -13,7 +13,7 @@ commands:
     permission: PhantomControl.globaltoggle
   phantom:
     description: "Command which allows toggling phantoms."
-    usage: "/phantom (on/off) (global/username, requires an on/off argument)"
+    usage: "/phantom (on/off/status/toggle) (global/username, requires an on/off argument)"
     permission: PhantomControl.playertoggle
 
 

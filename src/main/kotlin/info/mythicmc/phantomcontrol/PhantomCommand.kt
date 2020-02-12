@@ -2,16 +2,16 @@ package info.mythicmc.phantomcontrol
 
 import org.bukkit.ChatColor
 import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 
-class PhantomCommand(private val plugin: PhantomControl) : CommandExecutor {
+class PhantomCommand(private val plugin: PhantomControl) : TabExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         when {
-            args.isEmpty() -> {
+            args.isEmpty() || args[0] == "status" -> {
                 sender.sendMessage("${ChatColor.AQUA}Phantoms are currently: ${
-                if (plugin.isEnabledForPlayer(sender.name)) "${ChatColor.GREEN}enabled" else "${ChatColor.RED}disabled"
+                    if (plugin.isEnabledForPlayer(sender.name)) "${ChatColor.GREEN}enabled" else "${ChatColor.RED}disabled"
                 } ${ChatColor.AQUA}for you.")
                 return true
             }
@@ -42,7 +42,6 @@ class PhantomCommand(private val plugin: PhantomControl) : CommandExecutor {
                 return true
             }
             args[0] == "on" && args.size == 1 -> {
-                // If enabled, we tell them phantoms are already enabled.
                 when {
                     sender !is Player -> sender.sendMessage("${ChatColor.RED}This command cannot be executed from console!")
                     plugin.isEnabledForPlayer(sender.name) -> sender.sendMessage("${ChatColor.RED}You already have phantoms enabled!")
@@ -59,9 +58,9 @@ class PhantomCommand(private val plugin: PhantomControl) : CommandExecutor {
             }
             args[0] == "on" && args.size == 2 -> {
                 // TODO: Check if player exists.
-                // If enabled, we tell them phantoms are already enabled.
                 if (!sender.hasPermission("phantomcontrol.globaltoggle"))
                     sender.sendMessage("${ChatColor.RED}You do not have permission for this!")
+                // If enabled, we tell them phantoms are already enabled.
                 else if (plugin.isEnabledForPlayer(args[1]))
                     sender.sendMessage("${ChatColor.RED}They already have phantoms enabled!")
                 // else if (plugin.server.getPlayerExact(args[1]) == null)
@@ -77,12 +76,12 @@ class PhantomCommand(private val plugin: PhantomControl) : CommandExecutor {
                 return true
             }
             args[0] == "off" && args.size == 1 -> {
-                // If disabled, we tell them phantoms are already disabled.
                 if (sender !is Player)
                     sender.sendMessage("${ChatColor.RED}This command cannot be executed from console!")
+                // If disabled, we tell them phantoms are already disabled.
                 else if (!plugin.isEnabledForPlayer(sender.name))
                     sender.sendMessage("${ChatColor.RED}You already have phantoms disabled!")
-                else if ((!sender.world.isDayTime || sender.world.isThundering) && !sender.hasPermission("phantomcontrol.globaltoggle"))
+                else if ((sender.world.time > 13800 || sender.world.isThundering) && !sender.hasPermission("phantomcontrol.globaltoggle"))
                     sender.sendMessage("${ChatColor.RED}Phantoms may not be toggled at night or during thunderstorms!")
                 else {
                     // We remove the player's exemption.
@@ -96,9 +95,9 @@ class PhantomCommand(private val plugin: PhantomControl) : CommandExecutor {
             }
             args[0] == "off" && args.size == 2 -> {
                 // TODO: Check if player exists.
-                // If disabled, we tell them phantoms are already disabled.
                 if (!sender.hasPermission("phantomcontrol.globaltoggle"))
                     sender.sendMessage("${ChatColor.RED}You do not have permission for this!")
+                // If disabled, we tell them phantoms are already disabled.
                 else if (!plugin.isEnabledForPlayer(args[1]))
                     sender.sendMessage("${ChatColor.RED}They already have phantoms disabled!")
                 // else if (plugin.server.getPlayerExact(args[1]) == null)
@@ -113,7 +112,40 @@ class PhantomCommand(private val plugin: PhantomControl) : CommandExecutor {
                 }
                 return true
             }
+            args[0] == "toggle" && (args.size == 1 || args.size == 2) -> {
+                // TODO: Check if player exists.
+                if (sender !is Player)
+                    sender.sendMessage("${ChatColor.RED}This command cannot be executed from console!")
+                else if ((sender.world.time > 13800 || sender.world.isThundering) && !sender.hasPermission("phantomcontrol.globaltoggle"))
+                    sender.sendMessage("${ChatColor.RED}Phantoms may not be toggled at night or during thunderstorms!")
+                else if (args.size == 2 && !sender.hasPermission("phantomcontrol.globaltoggle"))
+                    sender.sendMessage("${ChatColor.RED}You do not have permission for this!")
+                // else if (args.size == 2 && plugin.server.getPlayerExact(args[1]) == null)
+                // sender.sendMessage("${ChatColor.RED}This player does not exist!")
+                else {
+                    // We remove the player's exemption.
+                    val player = if (args.size == 1) sender.name else args[1]
+                    val list = plugin.storage.getStringList("exemptedPlayers")
+                    if (list.contains(player)) list.remove(player) else list.add(player)
+                    plugin.storage.set("exemptedPlayers", list)
+                    plugin.saveStorage()
+                    val res = if (plugin.isEnabledForPlayer(sender.name)) "enabled" else "disabled"
+                    sender.sendMessage("${ChatColor.GREEN}Phantoms have been $res for ${if (player == sender.name) "you" else "them"}!")
+                }
+                return true
+            }
             else -> return false
+        }
+    }
+
+    override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<String>): List<String> {
+        return when {
+            args.isEmpty() -> listOf("on", "off", "status", "toggle")
+            args.size == 1 -> listOf("on", "off", "status", "toggle").filter { it.startsWith(args[0]) }
+            args.size == 2 && (args[0] == "on" || args[0] == "off") -> {
+                plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(args[1]) }
+            }
+            else -> listOf("")
         }
     }
 }

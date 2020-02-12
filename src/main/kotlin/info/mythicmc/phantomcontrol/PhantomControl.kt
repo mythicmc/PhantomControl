@@ -13,11 +13,11 @@ class PhantomControl : JavaPlugin() {
         /*
         TODO:
         - Complete PhantomCommand.
-        - Test PhantomListener.
+        + Test PhantomListener.
         - Complete BukkitPhantomListener.
         - Allow disabling per-player spawning.
-        - Add /phantomtoggle or /phantom toggle.
-        - Add tab autocomplete.
+        + Add /phantomtoggle or /phantom toggle.
+        + Add tab autocomplete.
         */
 
         // Initialize storage.
@@ -31,7 +31,9 @@ class PhantomControl : JavaPlugin() {
             sender.sendMessage("${ChatColor.GREEN}Successfully reloaded plugin!")
             return@setExecutor true
         }
-        getCommand("phantom")?.setExecutor(PhantomCommand(this))
+        val phantomCommand = PhantomCommand(this)
+        getCommand("phantom")?.setExecutor(phantomCommand)
+        getCommand("phantom")?.tabCompleter = phantomCommand
 
         // If server is Paper, initialize PhantomListener, else BukkitPhantomListener.
         if (server.name == "Paper") {
