@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "info.mythicmc"
-version = "1.0.0-alpha.1"
+version = "1.0.0"
 
 description = "A plugin which allows controlling phantoms, global and per-player."
 
