@@ -40,8 +40,7 @@ class PhantomListener(private val plugin: PhantomControl) : Listener {
             e.isCancelled = true
             // Additionally, if the player spawned this phantom, it must be de-spawned.
             if ((e.damager as Phantom).spawningEntity == e.entity.uniqueId) e.damager.remove()
-        }
-        else if (
+        } else if (
                 e.damager.type == EntityType.PLAYER &&
                 e.entityType == EntityType.PHANTOM &&
                 e.entity.entitySpawnReason == naturalSpawnReason &&

@@ -11,7 +11,7 @@ class PhantomCommand(private val plugin: PhantomControl) : TabExecutor {
         when {
             args.isEmpty() || args[0] == "status" -> {
                 sender.sendMessage("${ChatColor.AQUA}Phantoms are currently: ${
-                    if (plugin.isEnabledForPlayer(sender.name)) "${ChatColor.GREEN}enabled" else "${ChatColor.RED}disabled"
+                if (plugin.isEnabledForPlayer(sender.name)) "${ChatColor.GREEN}enabled" else "${ChatColor.RED}disabled"
                 } ${ChatColor.AQUA}for you.")
                 return true
             }
@@ -64,7 +64,7 @@ class PhantomCommand(private val plugin: PhantomControl) : TabExecutor {
                 else if (plugin.isEnabledForPlayer(args[1]))
                     sender.sendMessage("${ChatColor.RED}They already have phantoms enabled!")
                 // else if (plugin.server.getPlayerExact(args[1]) == null)
-                    // sender.sendMessage("${ChatColor.RED}This player does not exist!")
+                // sender.sendMessage("${ChatColor.RED}This player does not exist!")
                 else {
                     // We exempt the player.
                     val list = plugin.storage.getStringList("exemptedPlayers")
@@ -101,7 +101,7 @@ class PhantomCommand(private val plugin: PhantomControl) : TabExecutor {
                 else if (!plugin.isEnabledForPlayer(args[1]))
                     sender.sendMessage("${ChatColor.RED}They already have phantoms disabled!")
                 // else if (plugin.server.getPlayerExact(args[1]) == null)
-                    // sender.sendMessage("${ChatColor.RED}This player does not exist!")
+                // sender.sendMessage("${ChatColor.RED}This player does not exist!")
                 else {
                     // We remove the player's exemption.
                     val list = plugin.storage.getStringList("exemptedPlayers")
