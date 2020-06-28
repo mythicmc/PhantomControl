@@ -13,11 +13,8 @@ class PhantomControl : JavaPlugin() {
         /*
         TODO:
         - Complete PhantomCommand.
-        + Test PhantomListener.
-        - Complete BukkitPhantomListener.
+        + Complete BukkitPhantomListener.
         - Allow disabling per-player spawning.
-        + Add /phantomtoggle or /phantom toggle.
-        + Add tab autocomplete.
         */
 
         // Initialize storage.
@@ -89,3 +86,4 @@ class PhantomControl : JavaPlugin() {
         }
     }
 }
+

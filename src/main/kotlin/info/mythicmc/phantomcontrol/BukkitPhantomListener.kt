@@ -15,10 +15,11 @@ class BukkitPhantomListener(private val plugin: PhantomControl) : Listener {
 
     @EventHandler
     fun onCreatureSpawnEvent(e: CreatureSpawnEvent) {
+        
         // If the entity isn't a phantom with a player target, we don't care.
-        if (e.entityType != EntityType.PHANTOM || (e as Phantom).target !is Player) return
+        if (e.entityType != EntityType.PHANTOM || (e.entity as Phantom).target !is Player) return
         // Check if phantoms are globally disabled and disabled for the player.
-        val player = (e as Phantom).target as Player? // TODO: Confirm whether this works or not.
+        val player = (e.entity as Phantom).target as Player? // TODO: Confirm whether this works or not.
         if (player != null && !plugin.isEnabledForPlayer(player.name)) {
             e.isCancelled = true
         }
